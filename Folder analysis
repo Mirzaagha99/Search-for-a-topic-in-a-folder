@@ -1,0 +1,124 @@
+#----->Do not modify anything of these lines, the only modify that you need to apply are indicated at the end of
+#----->this file
+
+import os
+import glob
+import PyPDF2
+from docx import Document
+from openpyxl import Workbook
+
+#pip intall PyPDF2
+#pip install python-docx
+#Easy Example
+def search_words_in_files(root_folder, search_words, Excel_file, output_folder):
+    # Create a new Excel workbook
+    wb = Workbook()
+    reported_files = set()
+    # Iterate through each search word and create a separate sheet for each
+    for word in search_words:
+        ws = wb.create_sheet(title=word)
+
+        # Add headers to the Excel sheet
+        ws.append(["File Path", "Word"])
+
+        # Keep track of files that have already been reported for each word
+        #reported_files = set()
+
+        # Iterate through all files in the specified folder and its subdirectories
+        for foldername, subfolders, filenames in os.walk(root_folder):
+            for filename in filenames:
+                file_path = os.path.join(foldername, filename)
+
+                # Check if the file has already been reported for the current search word
+                if file_path not in reported_files:
+                    found_word = False  # Flag to check if the word has been found in the file
+                    page_num=0
+                    paragraph_index = 0
+
+                    # If the file is a PDF
+                    if filename.lower().endswith(".pdf"):
+                        # Open the PDF file in binary mode
+                        with open(file_path, "rb") as pdf_file:
+                            # Create a PDF reader object
+                            pdf_reader = PyPDF2.PdfReader(pdf_file)
+
+                            # Iterate through all pages in the PDF
+                            while (page_num in range(len(pdf_reader.pages))) and (found_word == False):
+                                # Extract text from the current page
+                                page_text = pdf_reader.pages[page_num].extract_text()
+
+                                # Check if the current search word is in the page text
+                                if word.lower() in page_text.lower():
+                                    found_word = True
+
+                                    # Add file path and word to the Excel sheet
+                                    ws.append([file_path, word])
+
+                                    # Break out of the loop once a word is found in the file
+                                    break
+                                page_num = page_num+1
+
+                    # If the file is a Word document
+                    elif filename.lower().endswith(".docx"):
+                        # Create a Document object from the Word file
+                        doc = Document(file_path)
+
+
+                        # Iterate through all paragraphs in the Word document
+                        while (paragraph_index <len(doc.paragraphs)) and (found_word == False):
+                            paragraph =doc.paragraphs[paragraph_index]
+                            # Check if the current search word is in the paragraph text
+                            if word.lower() in paragraph.text.lower():
+                                found_word = True
+
+                                # Add file path and word to the Excel sheet
+                                ws.append([file_path, word])
+
+                                # Break out of the loop once a word is found in the file
+                                break
+                            paragraph_index = paragraph_index+1
+                    # If the word is found, mark the file as reported for this word
+                    if found_word:
+                        reported_files.add(file_path)
+
+
+    # Remove the default empty sheet created by openpyxl
+    wb.remove(wb["Sheet"])
+
+    # Automatically adjust column widths
+    for sheet in wb.sheetnames:
+        ws = wb[sheet]
+        for column in ws.columns:
+            max_length = 0
+            column = [cell for cell in column]
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            ws.column_dimensions[column[0].column_letter].width = adjusted_width
+
+    # Save the Excel workbook with search results
+    #wb.save("search_results.xlsx") qui modificato
+    output_path = os.path.join(output_folder, Excel_file)
+    wb.save(output_path)
+    print("Search results saved in "+Excel_file)
+    print("sono alla fine")
+    print(reported_files)
+
+
+#----->Please do not modify anything before these lines of code,
+#----->In folder_path is indicated the path to arrive to the folder
+#----->In technology_words are indicated the words that you are looking for ins the folder
+#----->In Excel_file you can indicate the name of the Excel file
+#----->In output_folder you can indicate the path to arrive to the folder in which you want to save the Excel file
+folder_path = "C:/Users/ThinkPad/Documents/folder"
+technology_words = ["sonno", "Male"]
+Excel_file = "prova.xlsx"
+output_folder= "C:/Users/ThinkPad/Documents/folder_in_which_to_save_the_Excel_file"
+
+
+#----->Please do not modify the next line of code
+search_words_in_files(folder_path, technology_words, Excel_file, output_folder)
