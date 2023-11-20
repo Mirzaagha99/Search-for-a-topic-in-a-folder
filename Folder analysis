@@ -115,7 +115,7 @@ def search_words_in_files(root_folder, search_words, Excel_file, output_folder):
 #----->In Excel_file you can indicate the name of the Excel file
 #----->In output_folder you can indicate the path to arrive to the folder in which you want to save the Excel file
 folder_path = "C:/Users/ThinkPad/Documents/folder"
-technology_words = ["sonno", "Male"]
+technology_words = ["word1", "word2", "word3"]
 Excel_file = "prova.xlsx"
 output_folder= "C:/Users/ThinkPad/Documents/folder_in_which_to_save_the_Excel_file"
 
