@@ -1,2 +1,4 @@
 # Search-for-a-topic-in-a-folder
 Usually can happen to want to check in which files of a folder are reported osservations about a topic. The idea of this project is to create a vector with some keywords and to check all these keywords in the documents of a folder.
+This code will look at all the subfolders inside a folder to find the words reported in the vector. When it finds a word it writes in the Excel file the name of the file(Word or PDF) where is present that word. To avoid the code analyses the same file multiple times to check the words of the vector, only the first found word is reported in the Excel file, because the goal of the project is not to find all the words, but only referments to the topic. 
+All the code is commented, you need only to modify the last lines of code where you can indicate where is the folder, in which folder you want to save the Excel file, the word you are looking for, and the name of the Excel file.
